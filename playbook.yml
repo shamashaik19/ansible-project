@@ -1,0 +1,43 @@
+---
+- hosts: ansiblegroup
+  become: yes
+  tasks:
+    - name: Update all the packages
+      apt:
+        name: "*"
+        state: latest
+        update_cache: yes
+
+    - name: Install Apache HTTPD
+      apt:
+        name: apache2
+        state: present
+
+    - name: Ensure Apache is started and enabled
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Install Git
+      apt:
+        name: git
+        state: present
+
+    - name: Remove default Apache html folder
+      file:
+        path: /var/www/html/
+        state: absent
+
+    - name: Clone project repo
+      git:
+        repo: https://github.com/shamashaik19/ansible-project.git
+        dest: /home/ubuntu/ansible-project
+        force: yes
+
+    - name: Copy Clarity website files to apache root
+      copy:
+        src: /home/ubuntu/ansible-project/Clarity/
+        dest: /var/www/html/
+        remote_src: yes
+
